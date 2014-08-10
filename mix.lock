@@ -1,0 +1,2 @@
+%{"bson": {:git, "git://github.com/soundrop/bson-erlang", "3e6d7d5c58935768104f38bf9df96f213e139df9", [ref: "HEAD"]},
+  "mongodb": {:git, "git://github.com/comtihon/mongodb-erlang.git", "02bd61f27c54503f86015334b10a04bfa91698c0", []}}
