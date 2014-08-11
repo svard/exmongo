@@ -8,7 +8,11 @@ defmodule Exmongo do
     Exmongo.Server.start(host, port, db)
   end
 
-  def find_all(pid, collection) do
-    Exmongo.Server.find(pid, collection, {})
+  def find_all(pid, collection, opts \\ []) do
+    Exmongo.Server.find(pid, collection, {}, opts[:fields])
+  end
+
+  def find(pid, collection, selector, opts \\ []) do
+    Exmongo.Server.find(pid, collection, selector, opts[:fields])
   end
 end

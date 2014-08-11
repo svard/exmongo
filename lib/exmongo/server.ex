@@ -6,8 +6,9 @@ defmodule Exmongo.Server do
     GenServer.start(__MODULE__, {host, port, db})
   end
 
-  def find(pid, collection, selector) do
-    GenServer.call(pid, {:find, collection, selector})
+  def find(pid, collection, selector, fields) do
+    IO.inspect fields
+    GenServer.call(pid, {:find, collection, selector, fields})
   end
 
   def init({host, port, db}) do
@@ -20,17 +21,16 @@ defmodule Exmongo.Server do
     {:noreply, conn}
   end
 
-  def handle_call({:find, collection, selector}, _, conn) do
+  def handle_call({:find, collection, selector, fields}, _, conn) do
     cursor = :mongo.find(conn, collection, selector)
-    {:reply, process_cursor([], cursor), conn}
+    {:reply, process_cursor([], cursor, fields), conn}
   end
 
-  defp process_cursor(acc, cursor) do
+  defp process_cursor(acc, cursor, nil) do
     case :mc_cursor.next(cursor) do
       {data} ->
-#        [:bson.fields(data) | acc]
         [objectid_to_string(:bson.fields(data)) | acc]
-        |> process_cursor(cursor)
+        |> process_cursor(cursor, nil)
       
       _ ->
         :mc_cursor.close(cursor)
@@ -38,5 +38,19 @@ defmodule Exmongo.Server do
     end
   end
 
+  defp process_cursor(acc, cursor, fields) do
+    case :mc_cursor.next(cursor) do
+      {data} ->
+        selected_fields =
+        objectid_to_string(:bson.fields(data))
+        |> Dict.take(fields)
 
+        [selected_fields | acc]
+        |> process_cursor(cursor, fields)
+      
+      _ ->
+        :mc_cursor.close(cursor)
+        acc
+    end
+  end
 end
