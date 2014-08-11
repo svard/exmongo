@@ -1,6 +1,6 @@
 defmodule Exmongo.ObjectId do
   def objectid_to_string(field) do
-    Dict.update(field, :_id, nil, fn({bin}) -> binary_to_hex_list(bin) end)
+    Dict.update(field, :_id, nil, fn({bin}) -> to_string(binary_to_hex_list(bin)) end)
   end
     
   defp binary_to_hex_list(str) do
