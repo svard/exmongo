@@ -15,4 +15,8 @@ defmodule Exmongo do
   def find(pid, collection, selector, opts \\ []) do
     Exmongo.Server.find(pid, collection, selector, opts[:fields])
   end
+
+  def insert(pid, collection, doc) do
+    Exmongo.Server.insert(pid, collection, doc)
+  end
 end

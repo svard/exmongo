@@ -7,8 +7,11 @@ defmodule Exmongo.Server do
   end
 
   def find(pid, collection, selector, fields) do
-    IO.inspect fields
     GenServer.call(pid, {:find, collection, selector, fields})
+  end
+
+  def insert(pid, collection, doc) do
+    GenServer.cast(pid, {:insert, collection, doc})
   end
 
   def init({host, port, db}) do
@@ -24,6 +27,11 @@ defmodule Exmongo.Server do
   def handle_call({:find, collection, selector, fields}, _, conn) do
     cursor = :mongo.find(conn, collection, selector)
     {:reply, process_cursor([], cursor, fields), conn}
+  end
+
+  def handle_cast({:insert, collection, doc}, conn) do
+    :mongo.insert(conn, collection, doc)
+    {:noreply, conn}
   end
 
   defp process_cursor(acc, cursor, nil) do
